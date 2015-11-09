@@ -1,0 +1,7 @@
+---
+title: 'huber: M-estimation made easy'
+output: html_document
+---
+
+Our aim with this package is to simplify the calculus of M-estimation in R.
+
