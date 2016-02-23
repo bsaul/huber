@@ -1,10 +1,20 @@
-Package: huber
+Package: sandwichShop
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Extends sandwich Package
 Version: 0.1
-Date: 2015-11-09
-Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
-Description: More about what it does (maybe more than one line)
-License: What license is it under?
+Date: 2016-02-23
+Author: Bradley Saul [aut, cre]
+Maintainer: Bradley Saul <bradleysaul@gmail.com>
+Description: Extends the R package sandwich (Zeileis 2006) with functions to
+compute estimating equations from additional models including clustered data,
+lme4 and geepack.
+Imports:
+  sandwich (>= 2.3-4),
+  lme4 (>= 1.1-6),
+  geepack (>= 1.2-0)
+License: GPL (>= 2)
+Suggests:
+  testthat,
+  knitr
+VignetteBuilder: knitr
 LazyData: TRUE
