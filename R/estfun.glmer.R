@@ -1,11 +1,12 @@
 #' glmer Estimating Equations
 #'
-#'Currently supports Logistic-Normal model with univariate random effect.
-#'@param grad.method method passed to \code{\link[numDeriv]{grad}}
-#'@param grad.method.args method.args passed to \code{\link[numDeriv]{grad}}
-#'@export
+#' Currently supports Logistic-Normal model with univariate random effect.
+#' @param grad.method method passed to \code{\link[numDeriv]{grad}}
+#' @param grad.method.args method.args passed to \code{\link[numDeriv]{grad}}
+#' @importFrom sandwich estfun
+#' @export
 
-estfun.glmer <- function(x, grad.method, grad.method.args = list(), ...)
+estfun.glmerMod <- function(x, grad.method, grad.method.args = list(), ...)
 {
   xmat   <- lme4::getME(x, 'X')
   resp   <- lme4::getME(x, 'y')
@@ -14,29 +15,11 @@ estfun.glmer <- function(x, grad.method, grad.method.args = list(), ...)
   family <- x@resp$family$family
 
   # TODO: Use objFun function to switch between objective functions
-  # objective.fun <- sandwichshop::objFun.glmer(family)
+  objective.fun <- objFun.glmerMod(family)
 
   if(length(lme4::getME(x, 'theta')) > 1){
     stop('Not yet sure how to handle > 1 random effect')
   }
-
-  if(family == 'binomial'){
-    # Logistic-Normal Model
-    integrand <- function(b, response, xmatrix, parms){
-      lc <- outer(xmatrix %*% parms[-length(parms)], b, '+')
-      h  <- apply(lc, 3, function(x) dbinom(response, 1, plogis(x) ) )
-      hh <- apply(h, 2, prod)
-      hh * dnorm(b, mean = 0, sd = parms[length(parms)])
-    }
-
-    objective.fun <- function(parms, response, xmatrix){
-      log(integrate(integrand, lower = -Inf, upper = Inf, parms = parms,
-                    response = response, xmatrix = xmatrix)$value)
-    }
-  } else {
-    stop('Objective function not defined')
-  }
-
 
   out <- by(cbind(resp, xmat), clust, simplify = F, FUN = function(x) {
     x <- as.matrix(x)
@@ -53,9 +36,9 @@ estfun.glmer <- function(x, grad.method, grad.method.args = list(), ...)
 #'@param family
 #'@export
 #'
-objFun.glmer <- function(family, ...){
+objFun.glmerMod <- function(family, ...){
   switch(family,
-         binomial = objFun.glmer.binomial,
+         binomial = objFun.glmerMod.binomial,
          stop('Objective function not defined'))
 }
 
@@ -66,7 +49,7 @@ objFun.glmer <- function(family, ...){
 #'@param xmatrix
 #'@export
 
-objFun.glmer.binomial <- function(parms, response, xmatrix)
+objFun.glmerMod.binomial <- function(parms, response, xmatrix)
 {
   # Logistic-Normal Model
   integrand <- function(b, response, xmatrix, parms){
@@ -76,12 +59,9 @@ objFun.glmer.binomial <- function(parms, response, xmatrix)
     hh * dnorm(b, mean = 0, sd = parms[length(parms)])
   }
 
-  fout <- function(parms, response, xmatrix){
-    log(integrate(integrand, lower = -Inf, upper = Inf, parms = parms,
+  log(integrate(integrand, lower = -Inf, upper = Inf, parms = parms,
                   response = response, xmatrix = xmatrix)$value)
-  }
 
-  return(fout)
 }
 
 
