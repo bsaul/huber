@@ -58,7 +58,7 @@ gesteqn.gaussian <- function(x, w, r){
 
 gesteqn.binomial <- function(x, lc, w, f, r, psi){
   D <- apply(x, 2, function(i) i * exp(lc)/((1+exp(lc))^2) )
-  # This only works for independence working correlation matrices
+  # This only applies/works for independence working correlation matrices
   V <- psi * diag(f * (1 - f), ncol = length(f) )/length(f)
   D %*% V %*% diag(w) %*% r
 }
