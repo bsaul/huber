@@ -13,8 +13,6 @@ estfun.glmerMod <- function(x, grad.method, grad.method.args = list(), ...)
   parms  <- unlist(lme4::getME(x, c('beta', 'theta')))
   clust  <- lme4::getME(x, 'flist')
   family <- x@resp$family$family
-
-  # TODO: Use objFun function to switch between objective functions
   objective.fun <- objFun.glmerMod(family)
 
   if(length(lme4::getME(x, 'theta')) > 1){
@@ -34,6 +32,7 @@ estfun.glmerMod <- function(x, grad.method, grad.method.args = list(), ...)
 #' glmer Objective Fundtion
 #'
 #'@param family
+#'@param ... additional arguments pass to objective function
 #'@export
 #'
 objFun.glmerMod <- function(family, ...){
