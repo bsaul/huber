@@ -8,6 +8,8 @@ objFun.glmerMod(family, ...)
 }
 \arguments{
 \item{family}{}
+
+\item{...}{additional arguments pass to objective function}
 }
 \description{
 glmer Objective Fundtion

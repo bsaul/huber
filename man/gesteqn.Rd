@@ -4,20 +4,20 @@
 \alias{gesteqn}
 \title{Formulas for Generalized Estimating Equations}
 \usage{
-gesteqn(x, w, lc, f, r, psi, family)
+gesteqn(xmat, w, lp, f, r, psi, family_link)
 }
 \arguments{
-\item{x}{the model matrix}
-
 \item{w}{vector of weights}
-
-\item{lc}{linear predictor (X * beta)}
 
 \item{f}{fitted values}
 
-\item{r}{residuals (Y - $\mu$)}
+\item{r}{residuals (Y - mu)}
 
 \item{psi}{dispersion parameter}
+
+\item{x}{the model matrix}
+
+\item{lc}{linear predictor (X * beta)}
 
 \item{family}{model family}
 }
