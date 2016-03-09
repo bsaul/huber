@@ -9,22 +9,23 @@ estfun.geeglm <- function(x, ...)
   r      <- x$residuals
   f      <- x$fitted.values
   w      <- x$weights
-  lc     <- x$linear.predictor
+  lp     <- x$linear.predictor
   clust  <- x$id
   family <- x$family$family
   link   <- x$family$link
+  family_link <- paste(family, link, sep = '_')
   psi    <- summary(x)$dispersion$Estimate
 
   if(x$corstr != 'independence'){
     stop("only independence working correlation is supported at this time")
   }
 
-  m <- data.frame(f = f, r = r, w = w, lc = lc, xmat)
+  m <- data.frame(f = f, r = r, w = w, lp = lp, xmat)
   out <- lapply(split(m, clust), FUN = function(x){
     x <- as.matrix(x)
-    eqns <- gesteqn(x = x[, 5:ncol(x)], w = x[ ,'w'], f = x[ , 'f'],
-                    r = x[ , 'r'], lc = x[, 'lc'], psi = psi,
-                    family = family)
+    eqns <- gesteqn(xmat = x[, 5:ncol(x)], w = x[ ,'w'], f = x[ , 'f'],
+                    r = x[ , 'r'], lp = x[, 'lp'], psi = psi,
+                    family_link = family_link)
     t(eqns)
   })
 
@@ -41,27 +42,24 @@ estfun.geeglm <- function(x, ...)
 #' @param w vector of weights
 #' @param lc linear predictor (X * beta)
 #' @param f fitted values
-#' @param r residuals (Y - $\mu$)
+#' @param r residuals (Y - mu)
 #' @param psi dispersion parameter
 #' @param family model family
 
-gesteqn <- function(x, w, lc, f, r, psi, family){
-  switch(family,
-         gaussian = gesteqn.gaussian(x, w, r),
-         binomial = gesteqn.binomial(x, w, lc, f, r, psi),
-         "family not currently supported")
+gesteqn <- function(xmat, w, lp, f, r, psi, family_link){
+  switch(family_link,
+         gaussian_identity = gesteqn.gaussian.identity(xmat, w, r),
+         binomial_logit    = gesteqn.binomial.logit(xmat, w, lp, f, r, psi),
+         "family and/or link not currently supported")
 }
 
-gesteqn.gaussian <- function(x, w, r){
-  x %*% diag(w) %*% r
+gesteqn.gaussian.identity <- function(xmat, w, r){
+  t(xmat) %*% diag(w) %*% r
 }
 
-gesteqn.binomial <- function(x, lc, w, f, r, psi){
-  D <- apply(x, 2, function(i) i * exp(lc)/((1+exp(lc))^2) )
+gesteqn.binomial.logit <- function(xmat, lp, w, f, r, psi){
+  D <- apply(xmat, 2, function(x) x * exp(lc)/((1+exp(lp))^2) )
   # This only applies/works for independence working correlation matrices
   V <- psi * diag(f * (1 - f), ncol = length(f) )/length(f)
-  D %*% V %*% diag(w) %*% r
+  t(D) %*% V %*% diag(w) %*% r
 }
-
-
-
