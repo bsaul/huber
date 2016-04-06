@@ -15,7 +15,15 @@ estfun.glmerMod <- function(x, grad.method, grad.method.args = list(), ...)
   parms  <- unlist(lme4::getME(x, c('beta', 'theta')))
   clust  <- lme4::getME(x, 'flist')
   family <- x@resp$family$family
-  objective.fun <- objFun.glmerMod(family)
+  # objective.fun <- objFun.glmerMod(family)
+  link_obj <- stats::make.link(stats::family(x)$link)
+  gen_objFun_args <- list(
+    parms = parms, 
+    response = resp, 
+    xmatrix = xmat, 
+    inv_link_fun = link_obj$linkinv
+  )
+  objective.fun <- do.call(objFun.glmerMod.generalized, args = gen_objFun_args)
 
   if(length(lme4::getME(x, 'theta')) > 1){
     stop('Not yet sure how to handle > 1 random effect')
@@ -69,5 +77,28 @@ objFun.glmerMod.binomial <- function(parms, response, xmatrix)
 
 }
 
+
+
+#' glmer Objective Function for Likelihoods specified by glmerMod object
+#'
+#'@param vector of parameters
+#'@param response
+#'@param xmatrix
+#'@param inv_link_fun
+#'@export
+objFun.glmerMod.generalized <- function(parms, response, xmatrix, inv_link_fun)
+{
+  # Logistic-Normal Model
+  integrand <- function(b, response, xmatrix, parms){
+    lc <- outer(xmatrix %*% parms[-length(parms)], b, '+')
+    h  <- apply(lc, 3, function(x) dbinom(response, 1, plogis(x) ) )
+    hh <- apply(h, 2, prod)
+    hh * dnorm(b, mean = 0, sd = parms[length(parms)])
+  }
+  
+  inv_link_fun(integrate(integrand, lower = -Inf, upper = Inf, parms = parms,
+                response = response, xmatrix = xmatrix)$value)
+  
+}
 
 
