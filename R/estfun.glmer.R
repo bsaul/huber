@@ -18,9 +18,9 @@ estfun.glmerMod <- function(x, grad.method, grad.method.args = list(), ...)
   # objective.fun <- objFun.glmerMod(family)
   link_obj <- stats::make.link(stats::family(x)$link)
   gen_objFun_args <- list(
-    parms = parms, 
-    response = resp, 
-    xmatrix = xmat, 
+    parms = parms,
+    response = resp,
+    xmatrix = xmat,
     inv_link_fun = link_obj$linkinv
   )
   objective.fun <- do.call(objFun.glmerMod.generalized, args = gen_objFun_args)
@@ -78,7 +78,7 @@ objFun.glmerMod.binomial <- function(parms, response, xmatrix)
 }
 
 
-
+#------------------------------------------------------------------------------#
 #' glmer Objective Function for Likelihoods specified by glmerMod object
 #'
 #'@param vector of parameters
@@ -86,6 +86,8 @@ objFun.glmerMod.binomial <- function(parms, response, xmatrix)
 #'@param xmatrix
 #'@param inv_link_fun
 #'@export
+#'#------------------------------------------------------------------------------#
+#'
 objFun.glmerMod.generalized <- function(parms, response, xmatrix, inv_link_fun)
 {
   # Logistic-Normal Model
@@ -95,10 +97,10 @@ objFun.glmerMod.generalized <- function(parms, response, xmatrix, inv_link_fun)
     hh <- apply(h, 2, prod)
     hh * dnorm(b, mean = 0, sd = parms[length(parms)])
   }
-  
+
   inv_link_fun(integrate(integrand, lower = -Inf, upper = Inf, parms = parms,
                 response = response, xmatrix = xmatrix)$value)
-  
+
 }
 
 
