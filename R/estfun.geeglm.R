@@ -1,7 +1,9 @@
+#------------------------------------------------------------------------------#
 #' geeglm Estimating Equations
 #'
 #' @param x \code{geeglm} object
 #' @export
+#------------------------------------------------------------------------------#
 
 estfun.geeglm <- function(x, ...)
 {
@@ -36,6 +38,7 @@ estfun.geeglm <- function(x, ...)
   return(out)
 }
 
+#------------------------------------------------------------------------------#
 #' Formulas for Generalized Estimating Equations
 #'
 #' @param x the model matrix
@@ -45,6 +48,7 @@ estfun.geeglm <- function(x, ...)
 #' @param r residuals (Y - mu)
 #' @param psi dispersion parameter
 #' @param family model family
+#------------------------------------------------------------------------------#
 
 gesteqn <- function(xmat, w, lp, f, r, psi, family_link){
   switch(family_link,

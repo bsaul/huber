@@ -1,3 +1,4 @@
+#------------------------------------------------------------------------------#
 #' glmer Estimating Equations
 #'
 #' Currently supports Logistic-Normal model with univariate random effect.
@@ -5,6 +6,7 @@
 #' @param grad.method.args method.args passed to \code{\link[numDeriv]{grad}}
 #' @importFrom sandwich estfun
 #' @export
+#------------------------------------------------------------------------------#
 
 estfun.glmerMod <- function(x, grad.method, grad.method.args = list(), ...)
 {
@@ -29,24 +31,28 @@ estfun.glmerMod <- function(x, grad.method, grad.method.args = list(), ...)
   do.call('rbind', out)
 }
 
+#------------------------------------------------------------------------------#
 #' glmer Objective Fundtion
 #'
 #'@param family
 #'@param ... additional arguments pass to objective function
 #'@export
-#'
+#------------------------------------------------------------------------------#
+
 objFun.glmerMod <- function(family, ...){
   switch(family,
          binomial = objFun.glmerMod.binomial,
          stop('Objective function not defined'))
 }
 
+#------------------------------------------------------------------------------#
 #' glmer Objective Function for Logistic-Normal Likelihood
 #'
 #'@param vector of parameters
 #'@param response
 #'@param xmatrix
 #'@export
+#------------------------------------------------------------------------------#
 
 objFun.glmerMod.binomial <- function(parms, response, xmatrix)
 {
