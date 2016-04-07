@@ -68,14 +68,14 @@ objFun.glmerMod <- function(family, ...){
          stop('Objective function not defined'))
 }
 
-#' ------------------------------------------------------------------------------#
+#------------------------------------------------------------------------------#
 #' glmer Objective Function for Logistic-Normal Likelihood
 #'
 #' @param vector of parameters
 #' @param response
 #' @param xmatrix
 #' @export
-#' ------------------------------------------------------------------------------#
+#------------------------------------------------------------------------------#
 
 objFun.glmerMod.binomial <- function(parms, response, xmatrix)
 {

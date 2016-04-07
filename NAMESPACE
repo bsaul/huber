@@ -2,6 +2,9 @@
 
 S3method(estfun,geeglm)
 S3method(estfun,glmerMod)
+export(estfun_cluster)
+export(estfun_stacker)
 export(objFun.glmerMod)
 export(objFun.glmerMod.binomial)
+export(objFun.glmerMod.generalized)
 importFrom(sandwich,estfun)

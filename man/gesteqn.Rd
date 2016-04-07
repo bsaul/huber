@@ -9,6 +9,8 @@ gesteqn(xmat, w, lp, f, r, psi, family_link)
 \arguments{
 \item{w}{vector of weights}
 
+\item{lp}{linear predictor (X * beta)}
+
 \item{f}{fitted values}
 
 \item{r}{residuals (Y - mu)}
@@ -16,8 +18,6 @@ gesteqn(xmat, w, lp, f, r, psi, family_link)
 \item{psi}{dispersion parameter}
 
 \item{x}{the model matrix}
-
-\item{lc}{linear predictor (X * beta)}
 
 \item{family}{model family}
 }
