@@ -43,7 +43,7 @@ estfun.geeglm <- function(x, ...)
 #'
 #' @param x the model matrix
 #' @param w vector of weights
-#' @param lc linear predictor (X * beta)
+#' @param lp linear predictor (X * beta)
 #' @param f fitted values
 #' @param r residuals (Y - mu)
 #' @param psi dispersion parameter
@@ -62,7 +62,7 @@ gesteqn.gaussian.identity <- function(xmat, w, r){
 }
 
 gesteqn.binomial.logit <- function(xmat, lp, w, f, r, psi){
-  D <- apply(xmat, 2, function(x) x * exp(lc)/((1+exp(lp))^2) )
+  D <- apply(xmat, 2, function(x) x * exp(lp)/((1+exp(lp))^2) )
   # This only applies/works for independence working correlation matrices
   V <- psi * diag(f * (1 - f), ncol = length(f) )/length(f)
   t(D) %*% V %*% diag(w) %*% r
