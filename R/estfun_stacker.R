@@ -7,13 +7,9 @@
 #' @export
 #------------------------------------------------------------------------------#
 
-estfun_stacker <- function(models, data)
+estfun_stacker <- function(models)
 {
-  ee <- lapply(models, function(x){
-    args <- append(x$options, list(formula = x$formula, data = data) )
-    m <- do.call(x$method, args = args)
-    return(estfun(m))
-  })
+  ee <- lapply(models, function(x) estfun(x))
 
   return(do.call(cbind, ee))
 }
