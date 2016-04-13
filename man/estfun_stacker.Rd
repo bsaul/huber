@@ -4,7 +4,7 @@
 \alias{estfun_stacker}
 \title{Stacks Estimating Equations from multiple models using same data}
 \usage{
-estfun_stacker(models, data)
+estfun_stacker(models)
 }
 \arguments{
 \item{models}{list of lists of models with following arguments: `formula`,
