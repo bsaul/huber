@@ -38,6 +38,7 @@ library(dplyr)
 
 exampledt <- vaccinesim %>% filter(group <= 50)
 
+
 # Create list of arguments for treatment and outcome model
 
 model_args = list(
@@ -47,20 +48,23 @@ model_args = list(
     options = list(family = binomial)
   ) ,
   model_outcome = list(
-    formula = y ~ X1 + A,
-    method  = lm
-  ) )
+    formula = y ~ X1 + A + (1|group),
+    method  = glmer,
+    options = list(family = binomial)
+  )
+#   ,
+#   causal_effect = list(
+#     method = ipw_func,
+#     user   = TRUE
+#   )
+)
 
-# Create model objects
-models <- lapply(model_args, function(x){
-  args <- append(x$options, list(formula = x$formula, data = vaccinesim) )
-  do.call(x$method, args = args)
-})
+models <- make_models(model_args = model_args, data = exampledt)
 
 ```
 
 
 ```{r, estfun_stacker}
-# estfun_stacker(models, groups = 'group') 
+estfun_stacker(models) 
 # methods(estfun)
 ```
