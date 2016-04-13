@@ -5,11 +5,11 @@
 #' @param groups vector of groupings
 #' @export
 #------------------------------------------------------------------------------#
-estfun.glm_cluster <- function(x, groups, ...)
+estfun_cluster <- function(x, clusters, ...)
 {
-#   if(class(x) != 'lm' | class(x) != 'glm'){
-#     stop('Model must be of class lm or glm')
-#   }
-  out <- apply(estfun(x), 2, function(x) tapply(x, x$data[[groups]], sum))
+  if(class(x) != 'lm' | class(x) != 'glm'){
+    stop('Model must be of class lm or glm')
+  }
+  out <- apply(estfun(x), 2, function(x) tapply(x, x$data[[clusters]], sum))
   return(out)
 }
