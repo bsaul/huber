@@ -1,0 +1,66 @@
+---
+title: "Mathematics behind `sandwichShop`"
+author: "Bradley Saul"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+In causal inference and other settings, estimating equations are often used. Target parameters may depend on one or more models. For example, inverse probability weighted estimators often fit parametric models for the probability of treatment. Doubly robust estimators use models for both the outcome and treatment.
+
+This package provides tools to "stack" estimating equations from multiple models and derive asymptotically valid variance estimates via M-estimation [@stefanski2012].
+
+## General Notation
+
+|Notation | Description| 
+|-----------------|-----------------------|
+| $m$                | the number of statistically *independent* units (e.g. clusters) indexed by $i$ |
+| $n_i$              | where $m > 1$, the number of (possibly) correlated units with cluster $i$ | 
+|$O_i$               | data for group $i$, e.g.  $O_i = \{Y_i, A_i, L_i\}$ are the outcome, treatment, and covariate vectors (or matrices) for cluster $i$   |
+| $\psi(O_i, \theta_l)$   | the set of estimating equations corresponding the set of parameters $\theta_l$ from the $l$th model. E.g, for doubly robust estimation, $\theta_1$ could be the parameters in a logistic regression treatment model; $\theta_2$ may be parameters in a linear model for the outcome; and $\theta_3 = \mu$ may be the target parameter | 
+| $\theta = \{\theta_1, \dots, \theta_L\}$   | the set of all parameters in estimating equations. In most (all?) cases, $\theta_l \notin \theta_{l'}$ for all $l$. | 
+|$\psi(O_i, \theta)$ | estimating equations for all parameters in $\theta$ |  
+
+## Doubly Robust Example
+
+We consider the case of clustered data.
+
+
+```{r, message=FALSE, warning=FALSE}
+library(sandwich)
+library(sandwichShop)
+library(inferference)
+library(lme4)
+library(dplyr)
+
+exampledt <- vaccinesim %>% filter(group <= 50)
+
+# Create list of arguments for treatment and outcome model
+
+model_args = list(
+  model_treatment = list(
+    formula = A ~ X1 + (1|group),
+    method  = glmer,
+    options = list(family = binomial)
+  ) ,
+  model_outcome = list(
+    formula = y ~ X1 + A,
+    method  = lm
+  ) )
+
+# Create model objects
+models <- lapply(model_args, function(x){
+  args <- append(x$options, list(formula = x$formula, data = vaccinesim) )
+  do.call(x$method, args = args)
+})
+
+```
+
+
+```{r, estfun_stacker}
+# estfun_stacker(models, groups = 'group') 
+# methods(estfun)
+```
