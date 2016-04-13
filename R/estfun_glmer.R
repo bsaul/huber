@@ -47,8 +47,6 @@ estfun.glmerMod <- function(x, grad_options = NULL, ...)
                         grad_options)
 
     return( do.call(numDeriv::grad, args = grad_args) )
-#     numDeriv::grad(objective.fun,
-#                    method = grad.method, method.args = grad.method.args)
   })
 
   return( do.call('rbind', out) )
