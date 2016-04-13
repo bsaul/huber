@@ -10,12 +10,30 @@
 
 estfun.glmerMod <- function(x, grad_options = NULL, ...)
 {
+  psi.glmerMod(x = x, grad_options = grad_options, hessian = FALSE, ...)
+}
+
+
+#------------------------------------------------------------------------------#
+#' glmer Estimating Equations
+#'
+#' Currently supports Logistic-Normal model with univariate random effect.
+#' @param grad.method method passed to \code{\link[numDeriv]{grad}}
+#' @param grad.method.args method.args passed to \code{\link[numDeriv]{grad}}
+#' @importFrom sandwich estfun
+#' @export
+#------------------------------------------------------------------------------#
+
+psi.glmerMod <- function(x, grad_options = NULL, hessian, ...)
+{
   xmat   <- lme4::getME(x, 'X')
   resp   <- lme4::getME(x, 'y')
   parms  <- unlist(lme4::getME(x, c('beta', 'theta')))
   clust  <- lme4::getME(x, 'flist')
   family <- x@resp$family$family
-  objective.fun <- objFun.glmerMod(family)
+  objective_fun <- objFun.glmerMod(family)
+
+  deriv_fun <- if(hessian == TRUE) numDeriv::hessian else numDeriv::grad
 
   #  link_obj <- stats::make.link(stats::family(x)$link)
 #
@@ -28,7 +46,7 @@ estfun.glmerMod <- function(x, grad_options = NULL, ...)
 
   ## Warnings ##
   if(length(lme4::getME(x, 'theta')) > 1){
-    stop('estfun.glmer currently does not handle >1  random effect')
+    stop('estfun.glmer currently does not handle >1 random effect')
   }
 #   objective.fun <- objFun.glmerMod.generalized(
 #                         parms = parms,
@@ -40,13 +58,13 @@ estfun.glmerMod <- function(x, grad_options = NULL, ...)
   out <- by(cbind(resp, xmat), clust, simplify = F, FUN = function(x) {
     x <- as.matrix(x)
 
-    grad_args <- append(list(objective.fun,
+    grad_args <- append(list(objective_fun,
                              x = parms,
                              response = x[ , 1],
                              xmatrix = x[ , -1]) ,
                         grad_options)
 
-    return( do.call(numDeriv::grad, args = grad_args) )
+    return( do.call(deriv_fun, args = grad_args) )
   })
 
   return( do.call('rbind', out) )
