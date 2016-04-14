@@ -18,11 +18,34 @@ This package provides tools to "stack" estimating equations from multiple models
 |Notation | Description| 
 |-----------------|-----------------------|
 | $m$                | the number of statistically *independent* units (e.g. clusters) indexed by $i$ |
-| $n_i$              | where $m > 1$, the number of (possibly) correlated units with cluster $i$ | 
-|$O_i$               | data for group $i$, e.g.  $O_i = \{Y_i, A_i, L_i\}$ are the outcome, treatment, and covariate vectors (or matrices) for cluster $i$   |
+| $n_i$              | where $m > 1$, the number of (possibly) correlated units within cluster $i$ | 
+|$O_i$               | data for group $i$, e.g.  $O_i = \{Y_i, A_i, L_i\}$ could be the outcome, treatment, and covariate vectors (or matrices) for cluster $i$   |
 | $\psi(O_i, \theta_l)$   | the set of estimating equations corresponding the set of parameters $\theta_l$ from the $l$th model. E.g, for doubly robust estimation, $\theta_1$ could be the parameters in a logistic regression treatment model; $\theta_2$ may be parameters in a linear model for the outcome; and $\theta_3 = \mu$ may be the target parameter | 
-| $\theta = \{\theta_1, \dots, \theta_L\}$   | the set of all parameters in estimating equations. In most (all?) cases, $\theta_l \notin \theta_{l'}$ for all $l$. | 
+| $\theta = \{\theta_1, \dots, \theta_L, \mu\}$   | the set of all parameters in estimating equations. In most (all?) cases, $\theta_l \notin \theta_{l'}$ for all $l$. | 
 |$\psi(O_i, \theta)$ | estimating equations for all parameters in $\theta$ |  
+
+Under regularity conditions, the solution, $\hat{\theta}$ to:
+\[
+\sum_{i = 1}^m \psi(O_i, theta) = 0
+\]
+
+is a consistent estimator for $\theta$, and $\hat{U}^{-1} \hat{V} (\hat{U}^{-1})^T$ is the estimated variance-covariance for $\theta$ where:
+
+\[
+\hat{V} = \frac{1}{m} \sum_i \psi(O_i, \theta) \psi(O_i, \theta)^T 
+\]
+
+and 
+
+\[
+\hat{U} = \frac{1}{m} \sum_i \psi'(O_i, \theta)
+\]
+
+In [@stefanski2012], $V = B$ (aka the "meat" matrix) and $U^{-1} = A^{-1}$ (aka the "bread" matrix). 
+
+## Math to Code
+
+Let $\psi_{\mu} = \psi(O_i, \mu)$, dropping the $i$ notation for convenience. Define  
 
 ## Doubly Robust Example
 
