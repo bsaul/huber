@@ -31,6 +31,9 @@ estfun.glmerMod <- function(x, grad_method = 'simple', grad_options = NULL, ...)
 
 psi.glmerMod <- function(x, grad_method, grad_options = NULL, deriv, ...)
 {
+  xmat   <- lme4::getME(x, 'X')
+  resp   <- lme4::getME(x, 'y')
+  frame  <- as.data.frame(cbind(resp, xmat))
   parms  <- unlist(lme4::getME(x, c('beta', 'theta')))
   clust  <- lme4::getME(x, 'flist')
   family <- x@resp$family$family
@@ -43,7 +46,7 @@ psi.glmerMod <- function(x, grad_method, grad_options = NULL, deriv, ...)
     stop('estfun.glmer currently does not handle >1 random effect')
   }
 
-  split_data <- split(model.frame(x), clust)
+  split_data <- split(frame, clust)
 
   out <- mapply(split_data, SIMPLIFY = FALSE,
                 FUN = function(group_data){
@@ -89,10 +92,10 @@ objFun.glmerMod.binomial <- function(parms, response, xmatrix)
 {
   # Logistic-Normal Model
   integrand <- function(b, response, xmatrix, parms){
-    lp <- outer(xmatrix %*% parms[-length(parms)], b, '+')
-    h  <- apply(lp, 3, function(x) dbinom(response, 1, plogis(x) ) )
-    hh <- apply(h, 2, prod)
-    hh * dnorm(b, mean = 0, sd = parms[length(parms)])
+    pr_response <- plogis( drop(outer(xmatrix %*% parms[-length(parms)], b, '+') ) )
+    hh <- dbinom(response, 1, prob = pr_response )
+    hha <- apply(hh, 2, prod)
+    hha * dnorm(b, mean = 0, sd = parms[length(parms)])
   }
 
   log(integrate(integrand, lower = -Inf, upper = Inf, parms = parms,
