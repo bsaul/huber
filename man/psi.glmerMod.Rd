@@ -4,12 +4,18 @@
 \alias{psi.glmerMod}
 \title{glmer Estimating Equations}
 \usage{
-psi.glmerMod(x, grad_options = NULL, hessian, ...)
+psi.glmerMod(x, grad_method, grad_options = NULL, deriv, ...)
 }
 \arguments{
-\item{grad.method}{method passed to \code{\link[numDeriv]{grad}}}
+\item{x}{`glmer` object}
 
-\item{grad.method.args}{method.args passed to \code{\link[numDeriv]{grad}}}
+\item{grad_method}{method passed to \code{\link[numDeriv]{grad}} or
+\code{\link[numDeriv]{hessian}} when `hessian = TRUE`}
+
+\item{grad_options}{method.args passed to \code{\link[numDeriv]{grad}} or
+\code{\link[numDeriv]{hessian}} when `hessian = TRUE`}
+
+\item{deriv}{logical indicating whether to create derivative matrix of psi}
 }
 \description{
 Currently supports Logistic-Normal model with univariate random effect.

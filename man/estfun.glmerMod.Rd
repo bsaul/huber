@@ -4,7 +4,8 @@
 \alias{estfun.glmerMod}
 \title{glmer Estimating Equations}
 \usage{
-\method{estfun}{glmerMod}(x, grad_options = NULL, ...)
+\method{estfun}{glmerMod}(x, grad_method = "simple", grad_options = NULL,
+  ...)
 }
 \arguments{
 \item{grad.method}{method passed to \code{\link[numDeriv]{grad}}}

@@ -4,14 +4,16 @@
 \alias{bread.glmerMod}
 \title{glmer bread matrices}
 \usage{
-bread.glmerMod(x, grad_options = NULL, ...)
+bread.glmerMod(x, grad_method, grad_options = NULL, ...)
 }
 \arguments{
-\item{grad.method}{method passed to \code{\link[numDeriv]{grad}}}
+\item{x}{`glmer` object}
 
-\item{grad.method.args}{method.args passed to \code{\link[numDeriv]{grad}}}
+\item{grad_method}{method passed to \code{\link[numDeriv]{hessian}}}
+
+\item{grad_options}{method.args passed to \code{\link[numDeriv]{hessian}}}
 }
 \description{
-Currently supports Logistic-Normal model with univariate random effect.
+Currently supports Logistic-Normal model with single random effect.
 }
 
