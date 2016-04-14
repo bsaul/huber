@@ -10,7 +10,8 @@ Imports:
   sandwich (>= 2.3-4),
   geepack (>= 1.2-0),
   lme4 (>= 1.1-11),
-  numDeriv (>= 2014.2-1)
+  numDeriv (>= 2014.2-1),
+  Matrix (>= 1.2-2)
 License: GPL (>= 2)
 Suggests:
   testthat,
