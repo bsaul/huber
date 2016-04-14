@@ -8,9 +8,11 @@
 #' @export
 #------------------------------------------------------------------------------#
 
-estfun.glmerMod <- function(x, grad_options = NULL, ...)
+estfun.glmerMod <- function(x, grad_method = 'simple', grad_options = NULL, ...)
 {
-  psi.glmerMod(x = x, grad_options = grad_options, hessian = FALSE, ...)
+  psis <- psi.glmerMod(x = x, grad_method = grad_method,
+               grad_options = grad_options, deriv = FALSE, ...)
+  return(do.call(rbind, psis))
 }
 
 
@@ -18,56 +20,46 @@ estfun.glmerMod <- function(x, grad_options = NULL, ...)
 #' glmer Estimating Equations
 #'
 #' Currently supports Logistic-Normal model with univariate random effect.
-#' @param grad.method method passed to \code{\link[numDeriv]{grad}}
-#' @param grad.method.args method.args passed to \code{\link[numDeriv]{grad}}
-#' @importFrom sandwich estfun
+#' @param x `glmer` object
+#' @param grad_method method passed to \code{\link[numDeriv]{grad}} or
+#' \code{\link[numDeriv]{hessian}} when `hessian = TRUE`
+#' @param grad_options method.args passed to \code{\link[numDeriv]{grad}} or
+#'  \code{\link[numDeriv]{hessian}} when `hessian = TRUE`
+#' @param deriv logical indicating whether to create derivative matrix of psi
 #' @export
 #------------------------------------------------------------------------------#
 
-psi.glmerMod <- function(x, grad_options = NULL, hessian, ...)
+psi.glmerMod <- function(x, grad_method, grad_options = NULL, deriv, ...)
 {
-  xmat   <- lme4::getME(x, 'X')
-  resp   <- lme4::getME(x, 'y')
   parms  <- unlist(lme4::getME(x, c('beta', 'theta')))
   clust  <- lme4::getME(x, 'flist')
   family <- x@resp$family$family
   objective_fun <- objFun.glmerMod(family)
 
-  deriv_fun <- if(hessian == TRUE) numDeriv::hessian else numDeriv::grad
-
-  #  link_obj <- stats::make.link(stats::family(x)$link)
-#
-#   gen_objFun_args <- list(
-#     parms = parms,
-#     response = resp,
-#     xmatrix = xmat,
-#     inv_link_fun = link_obj$linkinv
-#   )
+  deriv_fun <- if(deriv == TRUE) numDeriv::hessian else numDeriv::grad
 
   ## Warnings ##
   if(length(lme4::getME(x, 'theta')) > 1){
     stop('estfun.glmer currently does not handle >1 random effect')
   }
-#   objective.fun <- objFun.glmerMod.generalized(
-#                         parms = parms,
-#                         response = resp,
-#                         xmatrix = xmat,
-#                         inv_link_fun = link_obj$linkinv)
 
+  split_data <- split(model.frame(x), clust)
 
-  out <- by(cbind(resp, xmat), clust, simplify = F, FUN = function(x) {
-    x <- as.matrix(x)
+  out <- mapply(split_data, SIMPLIFY = FALSE,
+                FUN = function(group_data){
+    group_data <- as.matrix(group_data)
 
-    grad_args <- append(list(objective_fun,
-                             x = parms,
-                             response = x[ , 1],
-                             xmatrix = x[ , -1]) ,
-                        grad_options)
+    deriv_args <- list(objective_fun,
+                       x = parms,
+                       response = group_data[ , 1],
+                       xmatrix  = group_data[ , -1],
+                       method = grad_method,
+                       method.args = grad_options)
 
-    return( do.call(deriv_fun, args = grad_args) )
+    do.call(deriv_fun, args = deriv_args)
   })
 
-  return( do.call('rbind', out) )
+  return(out)
 }
 
 #------------------------------------------------------------------------------#
