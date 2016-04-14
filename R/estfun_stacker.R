@@ -11,5 +11,5 @@ estfun_stacker <- function(models)
 {
   ee <- lapply(models, function(x) estfun(x))
 
-  return(do.call(cbind, ee))
+  return( do.call(cbind, ee) )
 }

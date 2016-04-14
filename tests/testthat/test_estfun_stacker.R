@@ -9,7 +9,7 @@ context('estfun_stacker')
 test_that('function returns n x p matrix',
           {
             data("vaccinesim", package = 'inferference')
-            models = list(
+            model_args = list(
               model_outcome = list(
                 formula = A ~ X1 + (1|group),
                 method  = 'glmer',
@@ -24,7 +24,9 @@ test_that('function returns n x p matrix',
             n <- 250
             p <- 6
 
-            ee <- estfun_stacker(models, data = vaccinesim)
+            models <- make_models(model_args, data = vaccinesim)
+
+            ee <- estfun_stacker(models)
 
             expect_equal(dim(ee), c(n, p))
           })
