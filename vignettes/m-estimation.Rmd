@@ -26,26 +26,50 @@ This package provides tools to "stack" estimating equations from multiple models
 
 Under regularity conditions, the solution, $\hat{\theta}$ to:
 \[
-\sum_{i = 1}^m \psi(O_i, theta) = 0
+\sum_{i = 1}^m \psi(O_i, \theta) = 0
 \]
 
 is a consistent estimator for $\theta$, and $\hat{U}^{-1} \hat{V} (\hat{U}^{-1})^T$ is the estimated variance-covariance for $\theta$ where:
 
 \[
-\hat{V} = \frac{1}{m} \sum_i \psi(O_i, \theta) \psi(O_i, \theta)^T 
+\hat{V} = \frac{1}{m} \sum_i \psi(O_i, \hat{\theta}) \psi(O_i, \hat{\theta})^T 
 \]
 
 and 
 
 \[
-\hat{U} = \frac{1}{m} \sum_i \psi'(O_i, \theta)
+\hat{U} = \frac{1}{m} \sum_i \psi'(O_i, \hat{\theta})
 \]
 
 In [@stefanski2012], $V = B$ (aka the "meat" matrix) and $U^{-1} = A^{-1}$ (aka the "bread" matrix). 
 
 ## Math to Code
 
-Let $\psi_{\mu} = \psi(O_i, \mu)$, dropping the $i$ notation for convenience. Define  
+Let $\psi_{\mu} = \psi(O_i, \mu)$ be the estimating equations of the target parameter; $\psi_{\gamma} = \psi(O_i, \gamma)$ be the estimating equations of the outcome model; and $\psi_{\alpha} = \psi(O_i, \lambda)$ estimating equations of the target parameter. Dropping the $i$ notation for convenience. 
+
+For the DR estimator:
+\[
+\psi(O_i, \mu) = g(O_i, \alpha, \gamma) - \mu
+\]
+
+when, for example, $\mu$ is overall mean, 
+
+\[
+g(O_i, \lambda, \gamma) = \frac{1}{n_i} \sum_{j = 1}^{n_i}\left\{ \frac{ Y_{ij} - h_{ij} (Y_i, L_i, A_i; \gamma) } { f(A_i, L_i, \lambda )} \pi(A_i; \alpha) + \sum_{a_i} h_{ij} (Y_i, L_i, A_i; \gamma) \pi(a_i; \alpha) \right\}
+\]
+
+We then need to create 4 functions. 
+
+|function| inputs | output | pseudocode example | 
+|--------|--------|--------|-------|
+| h      | outcome model | scalar  | `function(gamma, model1, ...)` `{ inv_link(model.matrix(model1) %*% gamma) } ` |
+| f      | treatment model | scalar  | `function(lambda, model2, ...)` `{ inv_link(model.matrix(model2) %*% lambda) } ` | 
+| g      |         |   scalar    | `function(theta, lambda), model1, model2)` `{ mean(outccome) * h(theta[gamma]) / f(theta[lambda])}` |
+| psi    | outcome model & treatment model | vector or matrix if d/dtheta psi  | `function(theta, model1, model2)` `{g(theta[1:p]) - theta[p] }` | 
+
+
+
+
 
 ## Doubly Robust Example
 
