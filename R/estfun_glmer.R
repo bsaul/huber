@@ -36,8 +36,9 @@ psi.glmerMod <- function(x, grad_method, grad_options = NULL, deriv, ...)
   frame  <- as.data.frame(cbind(resp, xmat))
   parms  <- unlist(lme4::getME(x, c('beta', 'theta')))
   clust  <- lme4::getME(x, 'flist')
-  family <- x@resp$family$family
-  objective_fun <- objFun.glmerMod(family)
+  family <- x@resp$family
+  linkinv <- family$linkinv
+  objective_fun <- objFun_glmerMod(family$family)
 
   deriv_fun <- if(deriv == TRUE) numDeriv::hessian else numDeriv::grad
 
@@ -56,6 +57,7 @@ psi.glmerMod <- function(x, grad_method, grad_options = NULL, deriv, ...)
                        x = parms,
                        response = group_data[ , 1],
                        xmatrix  = group_data[ , -1],
+                       linkinv  = linkinv,
                        method = grad_method,
                        method.args = grad_options)
 
@@ -73,26 +75,27 @@ psi.glmerMod <- function(x, grad_method, grad_options = NULL, deriv, ...)
 #'@export
 #------------------------------------------------------------------------------#
 
-objFun.glmerMod <- function(family, ...){
+objFun_glmerMod <- function(family, ...){
   switch(family,
-         binomial = objFun.glmerMod.binomial,
+         binomial = objFun_glmerMod_binomial,
          stop('Objective function not defined'))
 }
 
 #------------------------------------------------------------------------------#
 #' glmer Objective Function for Logistic-Normal Likelihood
 #'
-#' @param vector of parameters
+#' @param parms vector of parameters
 #' @param response
 #' @param xmatrix
+#' @param linkinv inverse link function
 #' @export
 #------------------------------------------------------------------------------#
 
-objFun.glmerMod.binomial <- function(parms, response, xmatrix)
+objFun_glmerMod_binomial <- function(parms, response, xmatrix, linkinv)
 {
   # Logistic-Normal Model
   integrand <- function(b, response, xmatrix, parms){
-    pr_response <- plogis( drop(outer(xmatrix %*% parms[-length(parms)], b, '+') ) )
+    pr_response <- linkinv( drop(outer(xmatrix %*% parms[-length(parms)], b, '+') ) )
     hh <- dbinom(response, 1, prob = pr_response )
     hha <- apply(hh, 2, prod)
     hha * dnorm(b, mean = 0, sd = parms[length(parms)])
@@ -104,27 +107,27 @@ objFun.glmerMod.binomial <- function(parms, response, xmatrix)
 }
 
 
-#------------------------------------------------------------------------------#
-#' glmer Objective Function for Likelihoods specified by glmerMod object
-#'
-#'@param vector of parameters
-#'@param response
-#'@param xmatrix
-#'@param inv_link_fun
-#'@export
-#------------------------------------------------------------------------------#
-
-objFun.glmerMod.generalized <- function(parms, response, xmatrix, inv_link_fun)
-{
-  # Logistic-Normal Model
-  integrand <- function(b, response, xmatrix, parms){
-    lp <- outer(xmatrix %*% parms[-length(parms)], b, '+')
-    h  <- apply(lp, 3, function(x) dbinom(response, 1, plogis(x) ) )
-    hh <- apply(h, 2, prod)
-    hh * dnorm(b, mean = 0, sd = parms[length(parms)])
-  }
-
-  inv_link_fun(integrate(integrand, lower = -Inf, upper = Inf, parms = parms,
-                response = response, xmatrix = xmatrix)$value)
-
-}
+# #------------------------------------------------------------------------------#
+# #' glmer Objective Function for Likelihoods specified by glmerMod object
+# #'
+# #'@param vector of parameters
+# #'@param response
+# #'@param xmatrix
+# #'@param inv_link_fun
+# #'@export
+# #------------------------------------------------------------------------------#
+#
+# objFun.glmerMod.generalized <- function(parms, response, xmatrix, inv_link_fun)
+# {
+#   # Logistic-Normal Model
+#   integrand <- function(b, response, xmatrix, parms){
+#     lp <- outer(xmatrix %*% parms[-length(parms)], b, '+')
+#     h  <- apply(lp, 3, function(x) dbinom(response, 1, plogis(x) ) )
+#     hh <- apply(h, 2, prod)
+#     hh * dnorm(b, mean = 0, sd = parms[length(parms)])
+#   }
+#
+#   inv_link_fun(integrate(integrand, lower = -Inf, upper = Inf, parms = parms,
+#                 response = response, xmatrix = xmatrix)$value)
+#
+# }
