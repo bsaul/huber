@@ -4,7 +4,7 @@
 \alias{make_bread}
 \title{Creates a block diagonal bread matrix from multiple models}
 \usage{
-make_bread(models)
+make_bread(models, grad_method = NULL)
 }
 \arguments{
 \item{models}{list of lists of models with following arguments: `formula`,

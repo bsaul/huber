@@ -4,7 +4,8 @@
 \alias{bread.glmerMod}
 \title{glmer bread matrices}
 \usage{
-bread.glmerMod(x, grad_method, grad_options = NULL, ...)
+\method{bread}{glmerMod}(x, grad_method = "Richardson", grad_options = NULL,
+  ...)
 }
 \arguments{
 \item{x}{`glmer` object}
