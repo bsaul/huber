@@ -13,7 +13,7 @@ make_models <- function(model_args, data)
     if(is.null(x$user)) x$user <- FALSE
 
     if(x$user == TRUE){
-      NULL
+      NULL # For now
     } else {
       args <- append(x$options, list(formula = x$formula, data = data) )
       do.call(method, args = args)
