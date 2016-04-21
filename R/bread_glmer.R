@@ -11,9 +11,10 @@
 
 bread.glmerMod <- function(x, grad_method = 'Richardson', grad_options = NULL, ...)
 {
-  psi_prime <- psi.glmerMod(x = x, grad_method,
-                           grad_options = grad_options,
-                           deriv = TRUE, ...)
+  psi_prime <- psi.glmerMod(x = x,
+                            grad_method,
+                            grad_options = grad_options,
+                            deriv = TRUE, ...)
   psi_prime <- array(unlist(psi_prime),
                      dim = c(nrow(psi_prime[[1]]),
                              ncol(psi_prime[[1]]),
