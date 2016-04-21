@@ -2,16 +2,20 @@
 #' glmer Estimating Equations
 #'
 #' Currently supports Logistic-Normal model with univariate random effect.
-#' @param grad.method method passed to \code{\link[numDeriv]{grad}}
-#' @param grad.method.args method.args passed to \code{\link[numDeriv]{grad}}
+#'
+#' @param x a \link[lme4]{merMod-class} object
+#' @param grad_method method passed to \code{\link[numDeriv]{grad}}
+#' @param grad_options list of options passed to \code{\link[numDeriv]{grad}}
+#'  'method.opts' argument
 #' @importFrom sandwich estfun
+#' @return a (number of groups) x (number of parameters) matrix
 #' @export
 #------------------------------------------------------------------------------#
 
-estfun.glmerMod <- function(x, grad_method = 'simple', grad_options = NULL, ...)
+estfun.glmerMod <- function(x, grad_method = 'simple', grad_options = NULL)
 {
   psis <- psi.glmerMod(x = x, grad_method = grad_method,
-               grad_options = grad_options, deriv = FALSE, ...)
+                       grad_options = grad_options, deriv = FALSE)
   return(do.call(rbind, psis))
 }
 
@@ -19,17 +23,18 @@ estfun.glmerMod <- function(x, grad_method = 'simple', grad_options = NULL, ...)
 #------------------------------------------------------------------------------#
 #' glmer Estimating Equations
 #'
-#' Currently supports Logistic-Normal model with univariate random effect.
-#' @param x `glmer` object
+#' Used by \link{estfun.glmerMod} to create estimating equation per group
+#'
+#' @param x a \code{merMod} object
 #' @param grad_method method passed to \code{\link[numDeriv]{grad}} or
-#' \code{\link[numDeriv]{hessian}} when `hessian = TRUE`
+#' \code{\link[numDeriv]{hessian}} when \code{deriv = TRUE}
 #' @param grad_options method.args passed to \code{\link[numDeriv]{grad}} or
-#'  \code{\link[numDeriv]{hessian}} when `hessian = TRUE`
+#'  \code{\link[numDeriv]{hessian}} when \code{deriv = TRUE}
 #' @param deriv logical indicating whether to create derivative matrix of psi
 #' @export
 #------------------------------------------------------------------------------#
 
-psi.glmerMod <- function(x, grad_method, grad_options = NULL, deriv, ...)
+psi.glmerMod <- function(x, grad_method, grad_options = NULL, deriv)
 {
   xmat   <- lme4::getME(x, 'X')
   resp   <- lme4::getME(x, 'y')

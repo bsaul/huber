@@ -4,13 +4,18 @@
 \alias{estfun.glmerMod}
 \title{glmer Estimating Equations}
 \usage{
-\method{estfun}{glmerMod}(x, grad_method = "simple", grad_options = NULL,
-  ...)
+\method{estfun}{glmerMod}(x, grad_method = "simple", grad_options = NULL)
 }
 \arguments{
-\item{grad.method}{method passed to \code{\link[numDeriv]{grad}}}
+\item{x}{a \link[lme4]{merMod-class} object}
 
-\item{grad.method.args}{method.args passed to \code{\link[numDeriv]{grad}}}
+\item{grad_method}{method passed to \code{\link[numDeriv]{grad}}}
+
+\item{grad_options}{list of options passed to \code{\link[numDeriv]{grad}}
+'method.opts' argument}
+}
+\value{
+a (number of groups) x (number of parameters) matrix
 }
 \description{
 Currently supports Logistic-Normal model with univariate random effect.
