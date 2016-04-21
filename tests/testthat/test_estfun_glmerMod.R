@@ -7,7 +7,7 @@ test_that('function returns n x p matrix',
                                data = ohio, family = binomial)
             n <- length(unique(lme4::getME(gm, 'flist')[[1]]))
             p <- length(unlist(lme4::getME(gm, c('beta', 'theta'))))
-            ee <- estfun(gm, grad_args = list(method = 'simple') )
+            ee <- estfun(gm, grad_method = 'simple')
 
             expect_equal(dim(ee), c(n, p))
           })
