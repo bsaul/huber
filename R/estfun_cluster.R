@@ -10,6 +10,6 @@ estfun_cluster <- function(x, clusters, ...)
   if(!any(class(x) %in% c('lm', 'glm'))){
     stop('Model must be of class lm or glm')
   }
-  out <- apply(estfun(x), 2, function(x) tapply(x, x$data[[clusters]], sum))
+  out <- apply(estfun(x), 2, function(psi) tapply(psi, clusters, sum))
   return(out)
 }
